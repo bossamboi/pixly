@@ -78,8 +78,15 @@ Strip Metadata: https://medium.com/nerd-for-tech/script-to-extract-image-metadat
 Radio Buttons with a Submit Button after choices are made.
 
 GOAL:
+Done: SQL database,
 
-Wednesday - python backend CRUD routes, SQL database, finish off scripts to do editing functions.
-        -download file from AWS to use in backend.  Get AWS file upload/download working today.
+Wednesday -
+-python backend CRUD routes
+-finish off scripts to do editing functions.
+-download file from AWS to use in backend.
+-Get AWS file upload/download working today.
+
+
+
 Thursday - Flask Server-Side Rendering (similar to Warbler)
 Friday -
