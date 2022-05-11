@@ -2,7 +2,7 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 
 # path to the image or video
-imagename = "nish.jpg"
+imagename = "images/bg.jpg"
 
 # read the image data using PIL
 image = Image.open(imagename)
