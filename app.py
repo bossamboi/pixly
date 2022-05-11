@@ -1,9 +1,11 @@
 from flask import Flask, flash, request, redirect, url_for, render_template
 from models import Image, db, connect_db
 import os
-from dotenv import load_dotenv;
+from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
-from helpers import extract_exif
+from helpers import extract_exif, s3
+from datetime import datetime
+from forms import EditImageForm
 
 load_dotenv()
 
@@ -44,29 +46,72 @@ def show_images():
 
 @app.get('/upload')
 def upload_form():
-    return render_template('upload.html');
+    return render_template('upload.html')
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
-	if 'file' not in request.files:
-		flash('No file found')
-		return redirect(request.url)
-	file = request.files['file']
-	if file.filename == '':
-		flash('No image selected for uploading')
-		return redirect(request.url)
-	if file and allowed_file(file.filename):
-		filename = secure_filename(file.filename)
-		file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        # exif = extract_exif("static/uploads/test.jpg")
-        # print("HELLO")
-		print('upload_image filename: ' + filename)
-		flash('Image successfully uploaded and displayed below')
-		return render_template('upload.html', filename=filename)
-	else:
-		flash('Allowed image types are -> jpg, jpeg')
-		return redirect(request.url)
+    """Route checks for valid image file. If valid, uploads file to aws and writes metadeta to DB"""
+    if 'file' not in request.files:
+        flash('No file found')
+        return redirect(request.url)
 
+    file = request.files['file']
+
+    if file.filename == '':
+        flash('No image selected for uploading')
+        return redirect(request.url)
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        filepath = f"{app.config['UPLOAD_FOLDER']}/{filename}"
+
+        exif = extract_exif(filepath)
+        if "Model" not in exif:
+            exif["Model"] = None
+
+        # store image in aws
+        aws_filename = str(datetime.now()) + ".jpg"
+        s3.upload_file(filepath, "pixlyrithm25", aws_filename, ExtraArgs = {"ACL": "public-read"})
+
+        # create new image instance with desired exif data and aws url
+        image = Image(exif_height = exif["Image Height"],
+                        exif_width = exif["Image Width"],
+                        exif_camera_model = exif["Model"],
+                        url = f"https://pixlyrithm25.s3.amazonaws.com/{aws_filename}")
+
+        db.session.add(image)
+        db.session.commit()
+
+        # TODO: delete temp file from uploads folder
+
+        flash('Image successfully uploaded and displayed below')
+        return redirect("/home")
+        # return render_template('upload.html', filename=filename)
+
+    else:
+        flash('Allowed image types are -> jpg, jpeg')
+        return redirect(request.url)
+
+@app.route('/<int:id>/edit', methods=['GET', "POST"])
+def show_edit_page(id):
+    image = Image.query.get_or_404(id)
+    form = EditImageForm()
+
+    if form.validate_on_submit():
+        # do something with image
+        # redirect
+        return redirect("/home")
+
+
+    # show image on one side
+    # show wtform on the other side with edit options
+
+    return render_template('edit.html', image=image, form=form)
+
+
+# this will go???
 @app.route('/display/<filename>')
 def display_image(filename):
 	#print('display_image filename: ' + filename)

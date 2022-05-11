@@ -2,7 +2,7 @@ from PIL import Image
 from PIL.ExifTags import TAGS
 
 # path to the image or video
-imagename = "images/bg.jpg"
+imagename = "images/nish.jpg"
 
 # read the image data using PIL
 image = Image.open(imagename)
@@ -19,7 +19,7 @@ info_dict = {
 }
 
 for label,value in info_dict.items():
-    print(f"{label:25}: {value}")
+    print(f"{label}: {value}")
 
 # extract EXIF data
 exifdata = image.getexif()
@@ -31,4 +31,4 @@ for tag_id in exifdata:
     # decode bytes 
     if isinstance(data, bytes):
         data = data.decode()
-    print(f"{tag:25}: {data}")
+    print(f"{tag}: {data}")

@@ -1,6 +1,6 @@
-import os;
-from dotenv import load_dotenv;
-import boto3;
+import os
+from dotenv import load_dotenv
+import boto3
 
 load_dotenv()
 

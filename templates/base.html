@@ -22,13 +22,18 @@
 
             <div class="navbar-header">
                 <a href="/home" class="navbar-brand">
-                    <img src="" alt="logo">
-                    <span>Pixly</span>
+                    <img src="static/logo.png" alt="logo" style="height: 80px">
+                    <span style="font-size: 40px">Pixly</span>
                 </a>
+
             </div>
 
             <ul class="nav navbar-nav navbar-right">
-
+                <li>
+                    <a href="/upload" class="navbar-brand">
+                        Upload
+                    </a>
+                </li>
                 {% block searchbox %}
                 <li>
                     <form class="navbar-form navbar-right" action="/home">
@@ -55,6 +60,8 @@
         {% endblock %}
 
     </div>
+    <footer><a href="https://www.flaticon.com/free-icons/art-and-design" title="art and design icons">Art and design
+            icons created by Freepik - Flaticon</a></footer>
 </body>
 
 </html>

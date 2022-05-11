@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-md-center">
+    <div class="col-md-4">
+        <h2>Edit Image</h2>
+        <form method="POST" id="image_edit_form">
+            {{ form.hidden_tag() }}
+
+            {% for field in form if field.widget.input_type != 'hidden' %}
+            {% for error in field.errors %}
+            <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+            {{ field }}
+            {% endfor %}
+
+            <span class="text-danger">
+                {{ error }}
+            </span>
+
+
+            <div class="edit-btn-area">
+                <button class="btn btn-success">Edit this image!</button>
+                <a href="/home" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-4">
+        <img src="{{image.url}}" style="height: 300px">
+    </div>
+</div>
+
+{% endblock %}
