@@ -11,6 +11,6 @@ s3 = boto3.client(
   aws_secret_access_key=os.environ['AWS_SECRET_KEY'],
 )
 
-s3.upload_file("./bg.png", "pixlyrithm25", "a.png", ExtraArgs = {
+s3.upload_file("./bg.png", "pixlyrithm25", "eric.png", ExtraArgs = {
     "ACL": "public-read"
 })
