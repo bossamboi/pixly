@@ -74,3 +74,12 @@ Re-Size: https://www.tutorialspoint.com/python_pillow/python_pillow_resizing_an_
 Border:
 
 Strip Metadata: https://medium.com/nerd-for-tech/script-to-extract-image-metadata-using-python-and-pillow-library-53a6ae56ccc3
+
+Radio Buttons with a Submit Button after choices are made.
+
+GOAL:
+
+Wednesday - python backend CRUD routes, SQL database, finish off scripts to do editing functions.
+        -download file from AWS to use in backend.  Get AWS file upload/download working today.
+Thursday - Flask Server-Side Rendering (similar to Warbler)
+Friday -
