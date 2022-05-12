@@ -1,10 +1,11 @@
 import os
+from venv import create
 from flask import Flask, flash, request, redirect, url_for, render_template
 from models import Image, db, connect_db
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
-from helpers import prep_img_for_db
-from pillow_helpers import convert_sepia, open_image, resize_image, sketchify_image, add_border
+from utils_helpers import prep_img_for_db, create_temp_folder
+from pillow_edit_helpers import convert_sepia, open_image, resize_image, sketchify_image, add_border
 from forms import EditImageForm
 import urllib.request
 
@@ -21,11 +22,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///pixly'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['SECRET_KEY'] = os.environ["APP_SECRET_KEY"]
-app.config['UPLOAD_FOLDER'] = "./static/uploads"
+app.config['UPLOAD_FOLDER'] = "static/uploads"
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 ALLOWED_EXTENSIONS = set(['jpg', 'jpeg'])
-
 
 connect_db(app)
 db.create_all()
@@ -58,11 +58,13 @@ def show_images():
 
 @app.get('/upload')
 def upload_form():
+    """Renders upload form"""
     return render_template('upload.html')
 
 @app.route('/upload', methods=['POST'])
 def upload_image():
     """Route checks for valid image file. If valid, uploads file to aws and writes metadeta to DB"""
+
     if 'file' not in request.files:
         flash('No file found')
         return redirect(request.url)
@@ -76,19 +78,19 @@ def upload_image():
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         resized_image = resize_image(file)
-        resized_image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        temp_filepath = f"{app.config['UPLOAD_FOLDER']}/{filename}"
 
-        filepath = f"{app.config['UPLOAD_FOLDER']}/{filename}"
+        resized_image.save(temp_filepath)
 
-        image = prep_img_for_db(filepath)
+
+        image = prep_img_for_db(temp_filepath)
 
         db.session.add(image)
         db.session.commit()
-        os.remove(filepath)
+        os.remove(temp_filepath)
 
         flash('Image successfully uploaded and displayed below')
         return redirect("/home")
-        # return render_template('upload.html', filename=filename)
 
     else:
         flash('Allowed image types are -> jpg, jpeg')
@@ -96,15 +98,21 @@ def upload_image():
 
 @app.route('/<int:id>/edit', methods=['GET', "POST"])
 def show_edit_page(id):
+    """Handle routing for image editing. Render form for GET. Process edits and save new image on valid submission. """
+
     image = Image.query.get_or_404(id)
     form = EditImageForm()
 
     if form.validate_on_submit():
+
+        temp_filepath = f"{app.config['UPLOAD_FOLDER']}/temp.jpg"
+
         # retrieve aws url and store it on our server temporarily
-        urllib.request.urlretrieve(image.url, "static/uploads/temp.jpg")
+        urllib.request.urlretrieve(image.url, temp_filepath)
 
-        image = open_image("static/uploads/temp.jpg")
+        image = open_image(temp_filepath)
 
+        # image editing
         if form.sketchify.data:
             image = sketchify_image(image)
 
@@ -114,26 +122,20 @@ def show_edit_page(id):
         if form.frame.data:
             image = add_border(image)
 
-        image.save(os.path.join(app.config['UPLOAD_FOLDER'], "temp.jpg"))
+        image.save(temp_filepath)
 
-        new_image = prep_img_for_db("static/uploads/temp.jpg")
+        new_image = prep_img_for_db(temp_filepath)
 
         db.session.add(new_image)
         db.session.commit()
-        os.remove("static/uploads/temp.jpg")
+        os.remove(temp_filepath)
 
-        # do something with image
-        # redirect
         return redirect("/home")
-
-
-    # show image on one side
-    # show wtform on the other side with edit options
 
     return render_template('edit.html', image=image, form=form)
 
 
-# this will go???
+# TODO: If time, view one photo at a time route
 @app.route('/display/<filename>')
 def display_image(filename):
 	#print('display_image filename: ' + filename)

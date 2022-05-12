@@ -10,11 +10,13 @@ load_dotenv()
 
 AWS_BUCKET_URL = "https://pixlyrithm25.s3.amazonaws.com"
 
-# path to the image or video
-# imagename = "images/bg.jpg"
+# TODO: fix
+def create_temp_folder(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
-# takes in image path -> exif metadata (width, height, camera_model)
 def extract_exif (image_path):
+    """ Takes in image path -> exif metadata (width, height, camera_model)"""
     image = Image.open(image_path)
 
     # read the image data using PIL
@@ -25,9 +27,6 @@ def extract_exif (image_path):
         "Image Width": image.width,
         "Image Format": image.format,
     }
-
-    # for label,value in info_dict.items():
-    #     print(f"{label}: {value}")
 
     # extract EXIF data
     exifdata = image.getexif()
@@ -43,6 +42,7 @@ def extract_exif (image_path):
     return info_dict
 
 
+# Uploads to AWS s3 bucket
 s3 = boto3.client(
   "s3",
   "us-east-1",
@@ -50,16 +50,15 @@ s3 = boto3.client(
   aws_secret_access_key=os.environ['AWS_SECRET_KEY'],
 )
 
-# s3.upload_file("./bg.png", "pixlyrithm25", "eric.png", ExtraArgs = {
-#     "ACL": "public-read"
-# })
-
 def prep_img_for_db(path):
+    """Takes image from image path, uploads to s3, and creates new Image instance for DB writing"""
+
     exif = extract_exif(path)
+
     if "Model" not in exif:
         exif["Model"] = None
 
-        # store image in aws
+    # store image in aws
     aws_filename = str(datetime.now()).replace(" ", "") + ".jpg"
     s3.upload_file(path, "pixlyrithm25", aws_filename, ExtraArgs = {"ACL": "public-read"})
 
@@ -68,4 +67,5 @@ def prep_img_for_db(path):
                     exif_width = exif["Image Width"],
                     exif_camera_model = exif["Model"],
                     url = f"{AWS_BUCKET_URL}/{aws_filename}")
+                    
     return new_image
