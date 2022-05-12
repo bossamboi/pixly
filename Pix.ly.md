@@ -104,6 +104,12 @@ Friday -
 
 LIGHTENING TALK TOUCHPOINTS (DRAFT):
 
+Technologies:
+Flask Python BackEnd and Server Side Rendering with Jinga
+Pillow Library
+urllib.request
+os
+
 Pix.ly: Image lighttable / editor»
 1. Users can view photos stored in the system
     - grab photos from database URL (Flask Jinga - for loop)
@@ -131,4 +137,5 @@ Images themselves are stored to Amazon S3, not in the database (you’ll get to 
 - adding a border around the image
     - Python PILLOW library offers a wide range image manipulation tools
     - Chose 3 and used WT Forms to provide options and validation
+    - urllib.request => Ran into issues with URL with whitespace, so used .replace(" ", "")
 
