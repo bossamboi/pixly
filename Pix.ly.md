@@ -100,6 +100,10 @@ Thursday -
 
 Friday -
 1. Refactor/reuse Code
+2. Testing
+3. Documentation/ README.com
+
+Review app for Testability, Reusability, Readability. 
 
 
 LIGHTENING TALK TOUCHPOINTS (DRAFT):
