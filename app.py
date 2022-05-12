@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 from helpers import extract_exif, s3
-from pillow_helpers import convert_sepia, save_image
+from pillow_helpers import convert_sepia, save_image, open_image
 from datetime import datetime
 from forms import EditImageForm
 import urllib.request
@@ -33,6 +33,12 @@ db.create_all()
 
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.get('/')
+def show_homepage():
+    """redirect to home """
+
+    return redirect("/home")
 
 @app.get('/home')
 def show_images():
@@ -108,28 +114,40 @@ def show_edit_page(id):
     if form.validate_on_submit():
         # retrieve aws url and store it on our server temporarily
         urllib.request.urlretrieve(image.url, "static/uploads/temp.jpg")
-        # save_image("static/uploads/temp.jpg", image.url)
-        new_sepia_img = convert_sepia("static/uploads/temp.jpg")
-        new_sepia_img.save(os.path.join(app.config['UPLOAD_FOLDER'], "temp_edited.jpg"))
 
-        exif = extract_exif("static/uploads/temp_edited.jpg")
+        image = open_image("static/uploads/temp.jpg")
+
+        # if form.sketchify.data:
+        #     # turn into sketch
+
+        # if form.sepia.data:
+        new_sepia_img = convert_sepia(image)
+        # image = convert_sepia(image)
+        new_sepia_img.save(os.path.join(app.config['UPLOAD_FOLDER'], "temp_sepia.jpg"))
+        
+        # if form.frame.data:
+        #     # frame image
+        breakpoint()
+
+        
+        exif = extract_exif("static/uploads/temp_sepia.jpg")
         if "Model" not in exif:
             exif["Model"] = None
 
         # store image in aws
         aws_filename = str(datetime.now()).replace(" ", "") + ".jpg"
-        s3.upload_file("static/uploads/temp_edited.jpg", "pixlyrithm25", aws_filename, ExtraArgs = {"ACL": "public-read"})
+        s3.upload_file("static/uploads/temp_sepia.jpg", "pixlyrithm25", aws_filename, ExtraArgs = {"ACL": "public-read"})
 
         # create new image instance with desired exif data and aws url
-        image = Image(exif_height = exif["Image Height"],
+        new_image = Image(exif_height = exif["Image Height"],
                         exif_width = exif["Image Width"],
                         exif_camera_model = exif["Model"],
                         url = f"https://pixlyrithm25.s3.amazonaws.com/{aws_filename}")
 
-        db.session.add(image)
+        db.session.add(new_image)
         db.session.commit()
         os.remove("static/uploads/temp.jpg")
-        os.remove("static/uploads/temp_edited.jpg")
+        os.remove("static/uploads/temp_sepia.jpg")
 
         # do something with image
         # redirect

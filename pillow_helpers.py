@@ -48,8 +48,8 @@ def get_sepia_pixel(red, green, blue, alpha):
 
 
 # Convert an image to sepia
-def convert_sepia(path):
-    image = open_image(path)
+def convert_sepia(image):
+    # image = open_image(path)
     # Get size
     width, height = image.size
 
