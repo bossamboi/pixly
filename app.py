@@ -1,23 +1,21 @@
+import os
 from flask import Flask, flash, request, redirect, url_for, render_template
 from models import Image, db, connect_db
-import os
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
-from helpers import extract_exif, s3
-from pillow_helpers import convert_sepia, save_image, open_image
-from datetime import datetime
+from helpers import prep_img_for_db
+from pillow_helpers import convert_sepia, open_image, resize_image, sketchify_image, add_border
 from forms import EditImageForm
 import urllib.request
 
+#Specify agent for urllib.request, so AWS site does not block access to images
 opener=urllib.request.build_opener()
 opener.addheaders=[('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
 urllib.request.install_opener(opener)
 
-
 load_dotenv()
 
-"Flask app for Pixly"
-
+""" Flask app for Pixly """ #TODO: Should this be in separate config file?
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///pixly'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -27,6 +25,7 @@ app.config['UPLOAD_FOLDER'] = "./static/uploads"
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 ALLOWED_EXTENSIONS = set(['jpg', 'jpeg'])
+
 
 connect_db(app)
 db.create_all()
@@ -76,23 +75,12 @@ def upload_image():
 
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        resized_image = resize_image(file)
+        resized_image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
         filepath = f"{app.config['UPLOAD_FOLDER']}/{filename}"
 
-        exif = extract_exif(filepath)
-        if "Model" not in exif:
-            exif["Model"] = None
-
-        # store image in aws
-        aws_filename = str(datetime.now()).replace(" ", "") + ".jpg"
-        s3.upload_file(filepath, "pixlyrithm25", aws_filename, ExtraArgs = {"ACL": "public-read"})
-
-        # create new image instance with desired exif data and aws url
-        image = Image(exif_height = exif["Image Height"],
-                        exif_width = exif["Image Width"],
-                        exif_camera_model = exif["Model"],
-                        url = f"https://pixlyrithm25.s3.amazonaws.com/{aws_filename}")
+        image = prep_img_for_db(filepath)
 
         db.session.add(image)
         db.session.commit()
@@ -117,37 +105,22 @@ def show_edit_page(id):
 
         image = open_image("static/uploads/temp.jpg")
 
-        # if form.sketchify.data:
-        #     # turn into sketch
+        if form.sketchify.data:
+            image = sketchify_image(image)
 
-        # if form.sepia.data:
-        new_sepia_img = convert_sepia(image)
-        # image = convert_sepia(image)
-        new_sepia_img.save(os.path.join(app.config['UPLOAD_FOLDER'], "temp_sepia.jpg"))
-        
-        # if form.frame.data:
-        #     # frame image
-        breakpoint()
+        if form.sepia.data:
+            image = convert_sepia(image)
 
-        
-        exif = extract_exif("static/uploads/temp_sepia.jpg")
-        if "Model" not in exif:
-            exif["Model"] = None
+        if form.frame.data:
+            image = add_border(image)
 
-        # store image in aws
-        aws_filename = str(datetime.now()).replace(" ", "") + ".jpg"
-        s3.upload_file("static/uploads/temp_sepia.jpg", "pixlyrithm25", aws_filename, ExtraArgs = {"ACL": "public-read"})
+        image.save(os.path.join(app.config['UPLOAD_FOLDER'], "temp.jpg"))
 
-        # create new image instance with desired exif data and aws url
-        new_image = Image(exif_height = exif["Image Height"],
-                        exif_width = exif["Image Width"],
-                        exif_camera_model = exif["Model"],
-                        url = f"https://pixlyrithm25.s3.amazonaws.com/{aws_filename}")
+        new_image = prep_img_for_db("static/uploads/temp.jpg")
 
         db.session.add(new_image)
         db.session.commit()
         os.remove("static/uploads/temp.jpg")
-        os.remove("static/uploads/temp_sepia.jpg")
 
         # do something with image
         # redirect

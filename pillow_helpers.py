@@ -1,5 +1,10 @@
 # Imported PIL Library
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter, ImageOps
+
+from PIL.ImageFilter import (
+   BLUR, CONTOUR, DETAIL, EDGE_ENHANCE, EDGE_ENHANCE_MORE,
+   EMBOSS, FIND_EDGES, SMOOTH, SMOOTH_MORE, SHARPEN
+)
 
 
 # Open an Image
@@ -49,7 +54,6 @@ def get_sepia_pixel(red, green, blue, alpha):
 
 # Convert an image to sepia
 def convert_sepia(image):
-    # image = open_image(path)
     # Get size
     width, height = image.size
 
@@ -65,3 +69,23 @@ def convert_sepia(image):
 
     # Return new image
     return new
+
+# Resize the image
+def resize_image(image):
+    basewidth = 300
+    img = Image.open(image)
+    wpercent = (basewidth / float(img.size[0]))
+    hsize = int((float(img.size[1]) * float(wpercent)))
+    new_img = img.resize((basewidth, hsize), Image.ANTIALIAS)
+    return new_img
+
+#Sketchify the image
+def sketchify_image(image):
+    #Applying the blur filter
+    new_img = image.filter(CONTOUR)
+    return new_img
+
+#Add a border to image
+def add_border(image):
+    new_img = ImageOps.expand(image, border=(10,50))
+    return new_img
