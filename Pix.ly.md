@@ -88,5 +88,15 @@ Wednesday -
 
 
 
-Thursday - Flask Server-Side Rendering (similar to Warbler)
+Thursday -
+1. Users can search image data from the EXIF fields (you can learn about PostgreSQL full-text search)
+2. CSS styling
+    - fix logo on edit page
+    - make prettier (form, etc)
+3. Resize images for server capacity
+4. Populate with beautiful images of cats
+5. Add more editing functions (sketch, vignette, etc PILLOW)
+
+
 Friday -
+
