@@ -1,5 +1,8 @@
 import os
 import boto3
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Upload to AWS s3 bucket 
 s3 = boto3.client(
