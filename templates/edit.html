@@ -3,8 +3,8 @@
 {% block content %}
 <div class="row justify-content-md-center">
     <div class="col-md-4">
-        <h2>Edit Image</h2>
         <form method="POST" id="image_edit_form">
+            <h2 class="mb-3">Edit Image</h2>
             {{ form.hidden_tag() }}
 
             {% for field in form if field.widget.input_type != 'hidden' %}
@@ -12,7 +12,8 @@
             <span class="text-danger">{{ error }}</span>
             {% endfor %}
             <div>{{ field(class_="form__field")}}
-                {{ field.label(class_="form__label") }}</div>
+                {{ field.label(class_="form__label") }}
+            </div>
             {% endfor %}
 
             <span class="text-danger">
@@ -20,7 +21,7 @@
             </span>
 
 
-            <div class="edit-btn-area">
+            <div class="edit-btn-area mt-3">
                 <button class="btn btn-success">Edit this image!</button>
                 <a href="/home" class="btn btn-outline-secondary">Cancel</a>
             </div>
