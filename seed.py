@@ -5,6 +5,7 @@ db.drop_all()
 db.create_all()
 
 i1 = Image(
+    upload_filename="cat.jpg",
     exif_height=500,
     exif_width=700,
     exif_camera_model="iPhone 12 Pro",
@@ -13,6 +14,7 @@ i1 = Image(
 )
 
 i2 = Image(
+    upload_filename="catty.jpg",
     exif_height=1000,
     exif_width=1200,
     exif_camera_model="iPhone 12 Pro",
@@ -20,6 +22,7 @@ i2 = Image(
 )
 
 i3 = Image(
+    upload_filename="cats.jpg",
     exif_height=1000,
     exif_width=1200,
     exif_camera_model="iPad Pro",
@@ -27,6 +30,7 @@ i3 = Image(
 )
 
 i4 = Image(
+    upload_filename="kitten.jpg",
     exif_height=1000,
     exif_width=1200,
     exif_camera_model="Samsung Galaxy S22",
@@ -34,6 +38,7 @@ i4 = Image(
 )
 
 i5 = Image(
+    upload_filename="kittens.jpg",
     exif_height=1000,
     exif_width=1200,
     exif_camera_model="Google Pixel 6 Pro",
@@ -41,6 +46,7 @@ i5 = Image(
 )
 
 i6 = Image(
+    upload_filename="kits.jpg",
     exif_height=1000,
     exif_width=1200,
     exif_camera_model="Samsung Galaxy S22",
@@ -48,6 +54,7 @@ i6 = Image(
 )
 
 i7 = Image(
+    upload_filename="kitte.jpg",
     exif_height=1000,
     exif_width=1200,
     exif_camera_model=None,

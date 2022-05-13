@@ -1,5 +1,7 @@
 import os
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import desc, Index
+from tsvector import TSVector
 from PIL.ExifTags import TAGS
 from PIL import Image as PIL_Image
 from aws import s3
@@ -28,6 +30,9 @@ class Image(db.Model):
                     primary_key = True,
                     autoincrement=True)
 
+    upload_filename = db.Column(db.Text,
+                    nullable = False)
+
     exif_height = db.Column(db.Integer,
                     nullable = False)
 
@@ -40,8 +45,16 @@ class Image(db.Model):
     url = db.Column(db.Text,
                     nullable = False)
 
+    __ts_vector__ = db.Column(TSVector(),db.Computed(
+         "to_tsvector('english', upload_filename || ' ' || exif_height::varchar(255) || ' ' || exif_width::varchar(255) || ' ' || exif_camera_model)",
+         persisted=True))
+
+    __table_args__ = (Index('ix_image___ts_vector__',
+          __ts_vector__, postgresql_using='gin'),)
+
+
     def __repr__(self):
-        return f"<Image #{self.id}: {self.exif_height}px, {self.exif_width}px, {self.exif_camera_model},{self. url}>"
+        return f"<Image #{self.id}: {self.upload_filename}, {self.exif_height}px, {self.exif_width}px, {self.exif_camera_model},{self. url}>"
 
     def extract_exif (image_path):
         """ Takes in image path -> exif metadata (width, height, camera_model)"""
@@ -76,6 +89,11 @@ class Image(db.Model):
     @classmethod
     def upload_image(cls, path):
         """Takes image from image path, uploads to s3, and creates new Image instance for DB writing"""
+        # filename = secure_filename(file.filename)
+        # resized_image = resize_image(file)
+        # temp_filepath = f"{app.config['UPLOAD_FOLDER']}/{filename}"
+
+        # resized_image.save(temp_filepath)
 
         exif = Image.extract_exif(path)
 
@@ -87,7 +105,8 @@ class Image(db.Model):
         s3.upload_file(path, "pixlyrithm25", aws_filename, ExtraArgs = {"ACL": "public-read"})
 
         # create new image instance with desired exif data and aws url
-        new_image = Image(exif_height = exif["Image Height"],
+        new_image = Image(upload_filename = exif["Filename"],
+                        exif_height = exif["Image Height"],
                         exif_width = exif["Image Width"],
                         exif_camera_model = exif["Model"],
                         url = f"{AWS_BUCKET_URL}/{aws_filename}")
@@ -114,5 +133,5 @@ class Image(db.Model):
             image = add_border(image)
 
         image.save(path)
-        
+
         Image.upload_image(path)

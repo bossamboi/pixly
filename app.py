@@ -22,10 +22,16 @@ load_dotenv()
 connect_db(app)
 db.create_all()
 
+
 #Specify agent for urllib.request, so AWS site does not block access to images
 opener=urllib.request.build_opener()
 opener.addheaders=[('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
 urllib.request.install_opener(opener)
+
+def create_temp_folder(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
 
 #Check if image is .jpeg or .jpg
 def allowed_file(filename):
@@ -49,8 +55,10 @@ def show_images():
     if not search:
         images = Image.query.all()
     else:
-        images = Image.query.filter(
-            Image.exif_camera_model.like(f"%{search}%")).all()
+        images = Image.query.filter(Image.__ts_vector__.match(search)).all()
+
+        # Image.query.filter(
+        #     Image.exif_camera_model.like(f"%{search}%")).all()
 
     return render_template('home.html', images=images)
 
@@ -64,6 +72,9 @@ def render_upload_form():
 
 @app.route('/upload', methods=['POST'])
 def process_upload():
+
+    create_temp_folder(app.config['UPLOAD_FOLDER'])
+
     """Route checks for valid image file. If valid, upload file to AWS and
     write metadeta to DB"""
 
@@ -106,6 +117,8 @@ def show_edit_page(id):
 
     if form.validate_on_submit():
 
+        create_temp_folder(app.config['UPLOAD_FOLDER'])
+
         temp_filepath = f"{app.config['UPLOAD_FOLDER']}/temp.jpg"
 
         form_data = {
@@ -127,7 +140,7 @@ def show_edit_page(id):
     return render_template('edit.html', image=image, form=form)
 
 
-# TODO: If time, view one photo at a time route
+# TODO: If time, view one photo at a time route and allow user to download
 @app.route('/display/<filename>')
 def display_image(filename):
 	#print('display_image filename: ' + filename)

@@ -37,6 +37,11 @@ $ flask run -p 5001
 
 Visit [http://localhost:5001/](http://localhost:5001/) in your browser to see the results.
 `
+## Future
+1. Testing
+2. Add a route/page for users to download their edited image.
+3. Expand on PSQL full-text search with image recognition library to create image descriptions.
+
 
 ## Acknowledgments
 

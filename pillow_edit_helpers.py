@@ -2,22 +2,20 @@ from PIL import Image, ImageOps
 from PIL.ImageFilter import (CONTOUR)
 
 
-# Open an Image
-def open_image(path):
-    newImage = Image.open(path)
-    return newImage
-
-
-# Save Image
-def save_image(image, path):
-    image.save(path, 'png')
-
-
 # Create a new image with the given size
 def create_image(i, j):
     image = Image.new("RGB", (i, j), "white")
     return image
 
+# Resize the image
+def resize_image(image):
+    basewidth = 300
+    img = Image.open(image)
+    wpercent = (basewidth / float(img.size[0]))
+    hsize = int((float(img.size[1]) * float(wpercent)))
+    new_img = img.resize((basewidth, hsize), Image.ANTIALIAS)
+
+    return new_img
 
 # Limit maximum value to 255
 def get_max(value):
@@ -66,15 +64,6 @@ def convert_sepia(image):
     # Return new image
     return new
 
-# Resize the image
-def resize_image(image):
-    basewidth = 300
-    img = Image.open(image)
-    wpercent = (basewidth / float(img.size[0]))
-    hsize = int((float(img.size[1]) * float(wpercent)))
-    new_img = img.resize((basewidth, hsize), Image.ANTIALIAS)
-
-    return new_img
 
 #Sketchify the image
 def sketchify_image(image):
