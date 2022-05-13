@@ -1,10 +1,5 @@
-# Imported PIL Library
-from PIL import Image, ImageDraw, ImageFilter, ImageOps
-
-from PIL.ImageFilter import (
-   BLUR, CONTOUR, DETAIL, EDGE_ENHANCE, EDGE_ENHANCE_MORE,
-   EMBOSS, FIND_EDGES, SMOOTH, SMOOTH_MORE, SHARPEN
-)
+from PIL import Image, ImageOps
+from PIL.ImageFilter import (CONTOUR)
 
 
 # Open an Image
@@ -22,6 +17,7 @@ def save_image(image, path):
 def create_image(i, j):
     image = Image.new("RGB", (i, j), "white")
     return image
+
 
 # Limit maximum value to 255
 def get_max(value):
@@ -42,8 +38,8 @@ def get_pixel(image, i, j):
     pixel = image.getpixel((i, j))
     return pixel
 
+
 def get_sepia_pixel(red, green, blue, alpha):
-    # This is a really popular implementation
     tRed = get_max((0.759 * red) + (0.398 * green) + (0.194 * blue))
     tGreen = get_max((0.676 * red) + (0.354 * green) + (0.173 * blue))
     tBlue = get_max((0.524 * red) + (0.277 * green) + (0.136 * blue))
@@ -77,15 +73,18 @@ def resize_image(image):
     wpercent = (basewidth / float(img.size[0]))
     hsize = int((float(img.size[1]) * float(wpercent)))
     new_img = img.resize((basewidth, hsize), Image.ANTIALIAS)
+
     return new_img
 
 #Sketchify the image
 def sketchify_image(image):
-    #Applying the blur filter
+    #Apply the blur filter
     new_img = image.filter(CONTOUR)
+
     return new_img
 
 #Add a border to image
 def add_border(image):
     new_img = ImageOps.expand(image, border=(10,50))
+
     return new_img

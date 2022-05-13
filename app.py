@@ -1,18 +1,11 @@
 import os
 from flask import Flask, flash, request, redirect, url_for, render_template
-from models import Image, db, connect_db
-from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 from pillow_edit_helpers import resize_image
-from forms import EditImageForm
+from dotenv import load_dotenv
 import urllib.request
-
-#Specify agent for urllib.request, so AWS site does not block access to images
-opener=urllib.request.build_opener()
-opener.addheaders=[('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
-urllib.request.install_opener(opener)
-
-load_dotenv()
+from models import Image, db, connect_db
+from forms import EditImageForm
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///pixly'
@@ -22,14 +15,22 @@ app.config['SECRET_KEY'] = os.environ["APP_SECRET_KEY"]
 app.config['UPLOAD_FOLDER'] = "static/uploads"
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
+ALLOWED_EXTENSIONS = set(['jpg', 'jpeg'])
+
+load_dotenv()
 
 connect_db(app)
 db.create_all()
 
-ALLOWED_EXTENSIONS = set(['jpg', 'jpeg'])
+#Specify agent for urllib.request, so AWS site does not block access to images
+opener=urllib.request.build_opener()
+opener.addheaders=[('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
+urllib.request.install_opener(opener)
 
+#Check if image is .jpeg or .jpg
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @app.get('/')
 def show_homepage():
@@ -37,19 +38,19 @@ def show_homepage():
 
     return redirect("/home")
 
+
 @app.get('/home')
 def show_images():
     """Page that shows all images in the database. Can click images to edit
-
-    Can take a 'q' param in querystring to search by that camera name"""
+    Can take a 'q' param in querystring to search by camera model name"""
 
     search = request.args.get('q')
 
     if not search:
         images = Image.query.all()
     else:
-        # TODO: revisit adding additional filters for width/height
-        images = Image.query.filter(Image.exif_camera_model.like(f"%{search}%")).all()
+        images = Image.query.filter(
+            Image.exif_camera_model.like(f"%{search}%")).all()
 
     return render_template('home.html', images=images)
 
@@ -57,11 +58,14 @@ def show_images():
 @app.get('/upload')
 def render_upload_form():
     """Renders upload form"""
+
     return render_template('upload.html')
+
 
 @app.route('/upload', methods=['POST'])
 def process_upload():
-    """Route checks for valid image file. If valid, uploads file to aws and writes metadeta to DB"""
+    """Route checks for valid image file. If valid, upload file to AWS and
+    write metadeta to DB"""
 
     if 'file' not in request.files:
         flash('No file found', 'warning')
@@ -77,7 +81,8 @@ def process_upload():
         flash('Please submit image type of either .jpg or .jpeg', 'warning')
         return redirect(request.url)
 
-    else: 
+    else:
+        #TODO: refactor to include in Image.upload_image? line 84-88
         filename = secure_filename(file.filename)
         resized_image = resize_image(file)
         temp_filepath = f"{app.config['UPLOAD_FOLDER']}/{filename}"
@@ -103,21 +108,20 @@ def show_edit_page(id):
 
         temp_filepath = f"{app.config['UPLOAD_FOLDER']}/temp.jpg"
 
-        # retrieve aws url and store it on our server temporarily
-        urllib.request.urlretrieve(image.url, temp_filepath)
-
         form_data = {
             "sketchify": form.sketchify.data,
             "sepia": form.sepia.data,
             "frame": form.frame.data,
         }
 
+        # retrieve aws url and store it on our server temporarily
+        urllib.request.urlretrieve(image.url, temp_filepath)
+
         Image.make_edits(temp_filepath, form_data)
 
         db.session.commit()
-        
-        flash('Image successfully edited and displayed below', 'success')
 
+        flash('Image successfully edited and displayed below', 'success')
         return redirect("/home")
 
     return render_template('edit.html', image=image, form=form)

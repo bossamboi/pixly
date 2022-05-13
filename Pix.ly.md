@@ -89,19 +89,22 @@ Wednesday -
 Thursday -
 
 1. Users can search image data from the EXIF fields (you can learn about PostgreSQL full-text search)
-2. Refactor/reuse Code - *3pm code review*
+2. Refactor/reuse Code - *3pm code review***CHECK**
 3. CSS styling
-   - fix logo on edit page
-   - make prettier (form, etc)
+   - fix logo on edit page**CHECK**
+   - make prettier (form, etc)**CHECK**
    - loading page for idling
 3. Resize images for server capacity **CHECK**
 4. Populate with beautiful images of cats **CHECK**
 5. Add more editing functions (sketch (contour), border, etc PILLOW) **CHECK**
 
 Friday -
-1. Documentation/ README.com
-2. Testing
-3. Deploy site?
+1. Users can search image data from the EXIF fields (you can learn about PostgreSQL full-text search)
+2. CSS (loading page? fix Edit Page?)
+3. Documentation/ README.com (below)
+4. Testing?
+5. Deploy site? @11am PT
+6. consider all routes use resource (images)?
 
 Review app for Testability, Reusability, Readability.
 
@@ -141,3 +144,7 @@ Pix.ly: Image lighttable / editor»
   - Chose 3 and used WT Forms to provide options and validation
   - urllib.request => Ran into issues with URL with whitespace, so used .replace(" ", "")
 - sketchify image
+
+
+
+

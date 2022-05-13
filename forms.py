@@ -1,7 +1,6 @@
-from xmlrpc.client import Boolean
 from flask_wtf import FlaskForm
-from wtforms import SelectField, RadioField, BooleanField
-from wtforms.validators import DataRequired, Email, Length
+from wtforms import BooleanField
+
 
 class EditImageForm(FlaskForm):
     """Form for editing an image."""

@@ -1,7 +1,7 @@
 import os
 import boto3
 
-# Uploads to AWS s3 bucket TODO: separte out into own aws file
+# Upload to AWS s3 bucket 
 s3 = boto3.client(
   "s3",
   "us-east-1",

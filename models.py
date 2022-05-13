@@ -16,7 +16,8 @@ def connect_db(app):
     db.app = app
     db.init_app(app)
 
-    """Models for Pixly app."""
+
+"""Models for Pixly app."""
 
 class Image(db.Model):
     """Image information"""
@@ -40,11 +41,11 @@ class Image(db.Model):
                     nullable = False)
 
     def __repr__(self):
-        return f"<Image #{self.id}: {self.exif_height}px, {self.exif_width}px, {self.exif_camera_model}, {self.url}>"
+        return f"<Image #{self.id}: {self.exif_height}px, {self.exif_width}px, {self.exif_camera_model},{self. url}>"
 
     def extract_exif (image_path):
         """ Takes in image path -> exif metadata (width, height, camera_model)"""
-        
+
         image = PIL_Image.open(image_path)
 
         # read the image data using PIL
@@ -60,15 +61,18 @@ class Image(db.Model):
         exifdata = image.getexif()
 
         for tag_id in exifdata:
+
             # get the tag name, instead of human unreadable tag id
             tag = TAGS.get(tag_id, tag_id)
             data = exifdata.get(tag_id)
+
             # decode bytes
             if isinstance(data, bytes):
                 data = data.decode()
             info_dict[tag]=data
+
         return info_dict
-    
+
     @classmethod
     def upload_image(cls, path):
         """Takes image from image path, uploads to s3, and creates new Image instance for DB writing"""
@@ -89,12 +93,11 @@ class Image(db.Model):
                         url = f"{AWS_BUCKET_URL}/{aws_filename}")
 
         db.session.add(new_image)
-
         os.remove(path)
-                        
+
         return new_image
-    
-    
+
+
     @classmethod
     def make_edits(cls, path, form_data):
         """Edit image in given path with form_data conditions. Create new instance"""
@@ -111,5 +114,5 @@ class Image(db.Model):
             image = add_border(image)
 
         image.save(path)
-
+        
         Image.upload_image(path)
