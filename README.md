@@ -2,7 +2,7 @@
 
 ## Description
 
-Pix.ly is a `Flask BackEnd` application with Server Side Rendering. Images uploaded are re-sized for server handling and loaded into a cloud-based `AWS s3 bucket`, EXIF data is stripped and included as part of the image's database record. Utilizing the `Python Pillow library`, Pix.ly allows users to manipulate images: current functions include filter, sketchify, and border. Future development will include the ability of users to download their new image. Pix.ly has `PSQL full-text search` capabilities which allows handling of natural language searches vs. limited text queries.
+Pix.ly is a `Flask BackEnd` application with Server Side Rendering. Images uploaded are re-sized for server handling and loaded into a cloud-based `AWS s3 bucket`, EXIF data is stripped and included as part of the image's database record. Utilizing the `Python Pillow library`, Pix.ly allows users to manipulate images: current functions include filter, sketchify, and border. Pix.ly has `PSQL full-text search` capabilities which allows handling of natural language searches vs. limited text queries.
 
 
 ## Getting Started
@@ -41,7 +41,7 @@ Visit [http://localhost:5001/](http://localhost:5001/) in your browser to see th
 1. Testing
 2. Add a route/page for users to download their edited image.
 3. Expand on PSQL full-text search with image recognition library to create image descriptions.
-4. Add a delete image option. 
+4. Add a delete image option.
 
 
 ## Acknowledgments

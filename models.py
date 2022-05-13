@@ -89,12 +89,7 @@ class Image(db.Model):
     @classmethod
     def upload_image(cls, path):
         """Takes image from image path, uploads to s3, and creates new Image instance for DB writing"""
-        # filename = secure_filename(file.filename)
-        # resized_image = resize_image(file)
-        # temp_filepath = f"{app.config['UPLOAD_FOLDER']}/{filename}"
-
-        # resized_image.save(temp_filepath)
-
+        
         exif = Image.extract_exif(path)
 
         if "Model" not in exif:

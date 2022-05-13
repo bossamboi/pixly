@@ -94,7 +94,7 @@ def process_upload():
         return redirect(request.url)
 
     else:
-        #TODO: refactor to include in Image.upload_image? line 84-88
+        #TODO: refactor to include in Image.upload_image => line 84-88
         filename = secure_filename(file.filename)
         resized_image = resize_image(file)
         temp_filepath = f"{app.config['UPLOAD_FOLDER']}/{filename}"
@@ -141,7 +141,7 @@ def show_edit_page(id):
     return render_template('edit.html', image=image, form=form)
 
 
-# TODO: If time, view one photo at a time route and allow user to download
+# TODO: If time, view one photo at a time route and allow user to download & delete?
 @app.route('/display/<filename>')
 def display_image(filename):
 	#print('display_image filename: ' + filename)
