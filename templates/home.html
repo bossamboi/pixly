@@ -2,10 +2,12 @@
 
 {% block content %}
 <div class="images-container">
-    <h1>Images</h1>
-    {% for image in images %}
-    <a href="/{{image.id}}/edit"><img src="{{image.url}}"></a>
+    <h1>Image Editor</h1>
+    <div class="d-flex flex-wrap justify-content-center">
+        {% for image in images %}
+        <a href="/images/{{image.id}}/edit"><img src="{{image.url}}"></a>
 
-    {% endfor %}
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

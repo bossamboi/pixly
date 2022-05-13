@@ -13,6 +13,11 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
     <link rel="stylesheet" href="/static/stylesheets/style.css">
     <link rel="shortcut icon" href="/static/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap" rel="stylesheet">
 </head>
 
 <body class="{% block body_class %}{% endblock %}">
@@ -22,25 +27,29 @@
 
             <div class="navbar-header">
                 <a href="/home" class="navbar-brand">
-                    <img src="static/logo.png" alt="logo" style="height: 80px">
-                    <span style="font-size: 40px">Pixly</span>
+                    <img src={{ url_for('static', filename="logo.png" )}} alt="logo" style="height: 80px">
+                    <span id="logo-name">PIX.ly</span>
                 </a>
 
             </div>
 
             <ul class="nav navbar-nav navbar-right">
                 <li>
-                    <a href="/upload" class="navbar-brand">
+                    <a id="upload-name" href="/upload" class="navbar-brand">
                         Upload
                     </a>
                 </li>
                 {% block searchbox %}
                 <li>
-                    <form class="navbar-form navbar-right" action="/home">
-                        <input name="q" class="form-control" placeholder="Search Pixly" aria-label="Search" id="search">
-                        <button class="btn btn-default">
-                            <span class="fa fa-search"></span>
-                        </button>
+                    <form class="navbar-form navbar-right container" action="/home">
+                        <div class="row">
+                            <input name="q" class="form-control col" placeholder="Search by Camera Model"
+                                aria-label="Search" id="search">
+                            <button class="btn btn-default col">
+                                <span class="fa fa-search"></span>
+                            </button>
+                        </div>
+
                     </form>
                 </li>
                 {% endblock %}
@@ -50,7 +59,7 @@
         </div>
     </nav>
 
-    <div class="container">
+    <main class="container">
 
         {% for category, message in get_flashed_messages(with_categories=True) %}
         <div class="alert alert-{{ category }}">{{ message }}</div>
@@ -59,8 +68,10 @@
         {% block content %}
         {% endblock %}
 
-    </div>
-    <footer><small><a href="https://www.flaticon.com/free-icons/art-and-design" title="art and design icons">Pixly logo created by Freepik - Flaticon</a></small></footer>
+    </main>
+    <footer class="footer"><small><a href="https://www.flaticon.com/free-icons/art-and-design"
+                title="art and design icons">Pixly logo
+                created by Freepik - Flaticon</a></small></footer>
 </body>
 
 </html>
