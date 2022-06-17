@@ -10,6 +10,7 @@ from pillow_edit_helpers import convert_sepia, sketchify_image, add_border
 
 AWS_BUCKET_URL = "https://pixlyrithm25.s3.amazonaws.com"
 
+
 db = SQLAlchemy()
 
 def connect_db(app):
