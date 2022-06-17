@@ -1,5 +1,7 @@
 # Pix.ly - Image Editor Coding Project
 
+Deployed Link: https://es-pixly.herokuapp.com/home
+
 ## Description
 
 Pix.ly is a `Flask BackEnd` application with Server Side Rendering. Images uploaded are re-sized for server handling and loaded into a cloud-based `AWS s3 bucket`, EXIF data is stripped and included as part of the image's database record. Utilizing the `Python Pillow library`, Pix.ly allows users to manipulate images: current functions include filter, sketchify, and border. Pix.ly has `PSQL full-text search` capabilities which allows handling of natural language searches vs. limited text queries.
